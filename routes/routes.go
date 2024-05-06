@@ -14,7 +14,7 @@ func Init() *gin.Engine {
 
 	// 用户注册
 	v1.POST("user/signup", service.SignUp)
-	//// 用户登陆
-	//v1.POST("user/login", service.LoginController)
+	// 用户登陆
+	v1.POST("user/login", service.Login)
 	return r
 }

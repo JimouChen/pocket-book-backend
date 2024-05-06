@@ -37,3 +37,24 @@ func InsertUser(user *models.ParamUser) (err error) {
 	}
 	return
 }
+
+func CheckLogin(user *models.ParamUser) (err error) {
+	sql := "select id from t_users where username = ? and password = ? limit 1;"
+	var resId int
+	if err = db.Get(&resId, sql, user.Username, user.Password); err != nil {
+		comm.MysqlLogger.Error().Msg(err.Error())
+		return comm.ErrReadMysql
+	}
+	// 记录最近的登陆时间
+	UpdateLoginTimeSql := "update t_users set last_login_time = now() where id = ?;"
+	session, err := db.Begin()
+	if _, err = session.Exec(UpdateLoginTimeSql, resId); err != nil {
+		_ = session.Rollback()
+		return comm.ErrServerBusy
+	}
+	if err = session.Commit(); err != nil {
+		return err
+	}
+	comm.MysqlLogger.Debug().Msgf("用户：%s 登陆成功！", user.Username)
+	return nil
+}

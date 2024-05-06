@@ -9,16 +9,24 @@ import (
 	"strings"
 )
 
-func Trans2cnForSignUp(en string) string {
-	zn := ""
-	if strings.Contains(en, "required") {
-		zn += "请求参数输入不能为空 "
+func Trans2cnForSignUp(err string) string {
+	msg := ""
+	if strings.Contains(err, "required") {
+		msg += "请求参数输入不能为空 "
 	}
-	if strings.Contains(en, "eqfield") {
-		zn += "密码和确认密码不一致"
+	if strings.Contains(err, "eqfield") {
+		msg += "密码和确认密码不一致"
 	}
 
-	return zn
+	return msg
+}
+
+func CheckLoginValid(err string) string {
+	msg := ""
+	if strings.Contains(err, "required") {
+		msg += "请求参数输入不能为空 "
+	}
+	return msg
 }
 
 // SignUp 用户注册
@@ -50,5 +58,24 @@ func SignUp(ctx *gin.Context) {
 	}
 	//- 返回响应
 	ResponseSuccess(ctx, "注册成功")
-	return
+}
+
+func Login(ctx *gin.Context) {
+	userMsg := new(models.ParmaLogin)
+	if err := ctx.ShouldBindJSON(userMsg); err != nil {
+		comm.Logger.Error().Msgf("login with invalid param", err.Error())
+		ResponseErrWithMsg(ctx, CodeInvalidParams, CheckLoginValid(err.Error()))
+		return
+	}
+
+	// 校验用户名和密码
+	u := &models.ParamUser{
+		Username: userMsg.Username,
+		Password: userMsg.Password,
+	}
+	if err := mysql.CheckLogin(u); err != nil {
+		ResponseErr(ctx, CodeUserErrLogin)
+		return
+	}
+	ResponseSuccess(ctx, "登陆成功")
 }

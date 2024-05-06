@@ -8,4 +8,5 @@ var (
 	ErrPswUName        = errors.New("用户名或密码输入错误")
 	ErrInvalidPswUName = errors.New("用户名或密码不合法")
 	ErrServerBusy      = errors.New("服务器繁忙")
+	ErrReadMysql       = errors.New("mysql数据库读取错误")
 )
