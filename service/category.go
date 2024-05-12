@@ -70,3 +70,15 @@ func EditCategoryById(ctx *gin.Context) {
 	comm.Logger.Info().Msgf("用户 %s 编辑了分类!", username)
 	ResponseSuccess(ctx, "编辑分类成功!")
 }
+
+func SearchCategoryByUserId(ctx *gin.Context) {
+	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
+
+	err, res := mysql.SearchCategoryByUserId(userId)
+	if err != nil {
+		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
+		return
+	}
+	ResponseSuccess(ctx, res)
+
+}

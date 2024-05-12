@@ -1,7 +1,10 @@
 package mysql
 
 import (
+	sql2 "database/sql"
+	"errors"
 	"pocket-book/comm"
+	"pocket-book/models"
 )
 
 func CheckCategoryIsExist(name string) (err error) {
@@ -82,6 +85,22 @@ func EditCategoryById(id int, name string) (err error) {
 	}
 
 	if err = session.Commit(); err != nil {
+		return
+	}
+	return
+}
+
+func SearchCategoryByUserId(userId int) (err error, results []*models.ParamCategories) {
+	sql := "select name from t_user2cate tu2c join t_categories tc on tu2c.category_id = tc.id where tu2c.user_id = ?;"
+
+	// 执行查询
+	if err = db.Select(&results, sql, userId); err != nil {
+		if errors.Is(err, sql2.ErrNoRows) {
+			comm.MysqlLogger.Info().Msg("该用户无设置新增分类")
+			return
+		}
+		comm.MysqlLogger.Error().Msg(err.Error())
+		err = comm.ErrServerBusy
 		return
 	}
 	return
