@@ -80,5 +80,13 @@ func SearchCategoryByUserId(ctx *gin.Context) {
 		return
 	}
 	ResponseSuccess(ctx, res)
+}
 
+func SearchAllCategory(ctx *gin.Context) {
+	err, res := mysql.SearchAllCategory()
+	if err != nil {
+		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
+		return
+	}
+	ResponseSuccess(ctx, res)
 }
