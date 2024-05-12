@@ -47,3 +47,22 @@ CREATE TABLE `t_transactions`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci
     comment '记账记录表';
+
+
+-- 用户与分类关系表
+CREATE TABLE `t_user2cate`
+(
+    `id`          INT(20) NOT NULL AUTO_INCREMENT,
+    `user_id`     INT(20) NOT NULL,
+    `category_id` INT(10) NOT NULL,
+    `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`user_id`) REFERENCES `t_users` (`id`),
+    FOREIGN KEY (`category_id`) REFERENCES `t_categories` (`id`),
+    INDEX `idx_user_category` (`user_id`, `category_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci
+    comment '用户与分类关系表';
+

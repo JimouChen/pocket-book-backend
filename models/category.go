@@ -5,5 +5,5 @@ type ParamCategories struct {
 }
 
 type ParamCategoryId struct {
-	Id string `json:"id" binding:"required"`
+	Id int `json:"id" binding:"required"`
 }

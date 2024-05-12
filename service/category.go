@@ -7,6 +7,7 @@ import (
 	"pocket-book/comm"
 	"pocket-book/dao/mysql"
 	"pocket-book/models"
+	"strconv"
 )
 
 func AddCategory(ctx *gin.Context) {
@@ -20,13 +21,15 @@ func AddCategory(ctx *gin.Context) {
 	// 检查分类是否存在，存在则提示，不存在则写入
 	if err := mysql.CheckCategoryIsExist(cateName); err != nil {
 		if errors.Is(err, comm.ErrCategoryExist) {
+			ResponseErr(ctx, CodeCategoryExist)
 			return
 		}
 		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
 		return
 	}
+	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
 	// 写表
-	if err := mysql.AddCategory(cateName); err != nil {
+	if err := mysql.AddCategory(cateName, userId); err != nil {
 		ResponseErrWithMsg(ctx, CodeServerBusy, fmt.Sprintf("添加分类失败：%s", err.Error()))
 		return
 	}
@@ -35,5 +38,23 @@ func AddCategory(ctx *gin.Context) {
 }
 
 func DeleteCategory(ctx *gin.Context) {
+	ReqData := new(models.ParamCategoryId)
+	if err := ctx.ShouldBindJSON(ReqData); err != nil {
+		comm.Logger.Error().Msgf("DeleteCategory api invalid param", err.Error())
+		ResponseErrWithMsg(ctx, CodeInvalidParams, err.Error())
+		return
+	}
+	username := ctx.Request.Header.Get(comm.StrUserName)
+	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
+
+	if err := mysql.DeleteCategoryById(ReqData.Id, userId); err != nil {
+		ResponseErrWithMsg(ctx, CodeServerBusy, fmt.Sprintf("删除分类失败：%s", err.Error()))
+		return
+	}
+	comm.Logger.Info().Msgf("用户 %s 删除了分类!", username)
+	ResponseSuccess(ctx, "删除分类成功!")
+}
+
+func EditCategoryById(ctx *gin.Context) {
 
 }

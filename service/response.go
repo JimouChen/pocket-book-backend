@@ -19,6 +19,7 @@ const (
 	CodeSuccess = 1000 + iota
 	CodeInvalidParams
 	CodeUserExist
+	CodeCategoryExist
 	CodeUserNotExist
 	CodeErrUserPsw
 	CodeServerBusy
@@ -43,6 +44,7 @@ var CodeMsgText = map[int]string{
 	CodeParamTypeErr:     "参数类型错误",
 	CodeUserNotLogin:     "用户没有登陆",
 	CodeUserErrLogin:     "用户名或密码输入有误",
+	CodeCategoryExist:    "分类已经存在",
 }
 
 func ResponseErr(ctx *gin.Context, code int) {

@@ -21,7 +21,7 @@ func Init() *gin.Engine {
 	v1.POST("/category", service.AddCategory)
 	v1.DELETE("/category", service.DeleteCategory)
 	//v1.GET("/category", service.SearchAllCategory)
-	//v1.PUT("/category", service.EditCategory)
+	v1.PUT("/category", service.EditCategoryById)
 
 	// 新增支出
 	v1.POST("/billing/expenses", service.AddExpenses)
