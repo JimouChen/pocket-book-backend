@@ -67,3 +67,22 @@ func DeleteCategoryById(cateId int, userId int) (err error) {
 	}
 	return
 }
+
+func EditCategoryById(id int, name string) (err error) {
+	session := SqlUtil{}.NewSession()
+	if session == nil {
+		return comm.ErrCreateMysqlSession
+	}
+	sql := "update t_categories set name = ? where id = ?;"
+	_, err = session.Exec(sql, name, id)
+	if err != nil {
+		_ = session.Rollback()
+		comm.MysqlLogger.Error().Msg(err.Error())
+		return comm.ErrServerBusy
+	}
+
+	if err = session.Commit(); err != nil {
+		return
+	}
+	return
+}

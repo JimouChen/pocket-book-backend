@@ -7,3 +7,8 @@ type ParamCategories struct {
 type ParamCategoryId struct {
 	Id int `json:"id" binding:"required"`
 }
+
+type ParamEditCategory struct {
+	Id   int    `json:"id" binding:"required"`
+	Name string `json:"name" binding:"required"`
+}

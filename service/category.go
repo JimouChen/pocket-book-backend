@@ -56,5 +56,17 @@ func DeleteCategory(ctx *gin.Context) {
 }
 
 func EditCategoryById(ctx *gin.Context) {
-
+	ReqData := new(models.ParamEditCategory)
+	if err := ctx.ShouldBindJSON(ReqData); err != nil {
+		comm.Logger.Error().Msgf("EditCategoryById api invalid param", err.Error())
+		ResponseErrWithMsg(ctx, CodeInvalidParams, err.Error())
+		return
+	}
+	username := ctx.Request.Header.Get(comm.StrUserName)
+	if err := mysql.EditCategoryById(ReqData.Id, ReqData.Name); err != nil {
+		ResponseErrWithMsg(ctx, CodeServerBusy, fmt.Sprintf("删除分类失败：%s", err.Error()))
+		return
+	}
+	comm.Logger.Info().Msgf("用户 %s 编辑了分类!", username)
+	ResponseSuccess(ctx, "编辑分类成功!")
 }
