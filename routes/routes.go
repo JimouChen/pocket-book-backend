@@ -20,7 +20,7 @@ func Init() *gin.Engine {
 	// 分类
 	v1.POST("/category", service.AddCategory)
 	v1.DELETE("/category", service.DeleteCategory)
-	v1.GET("/category", service.SearchCategoryByUserId)
+	v1.GET("/category", service.SearchCategoryByUsername)
 	v1.GET("/all_category", service.SearchAllCategory)
 	v1.PUT("/category", service.EditCategoryById)
 

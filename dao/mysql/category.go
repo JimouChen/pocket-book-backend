@@ -90,11 +90,11 @@ func EditCategoryById(id int, name string) (err error) {
 	return
 }
 
-func SearchCategoryByUserId(userId int) (err error, results []*models.ParamEditCategory) {
-	sql := "select tc.id, name from t_user2cate tu2c join t_categories tc on tu2c.category_id = tc.id where tu2c.user_id = ?;"
+func SearchCategoryByUsername(username string) (err error, results []*models.ParamEditCategory) {
+	sql := "select tc.id, name from t_user2cate tu2c join t_categories tc on tu2c.category_id = tc.id  join t_users on t_users.id = tu2c.user_id where t_users.username = ?;"
 
 	// 执行查询
-	if err = db.Select(&results, sql, userId); err != nil {
+	if err = db.Select(&results, sql, username); err != nil {
 		if errors.Is(err, sql2.ErrNoRows) {
 			comm.MysqlLogger.Info().Msg("该用户无设置新增分类")
 			return

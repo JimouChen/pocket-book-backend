@@ -2,5 +2,5 @@ package comm
 
 const (
 	StrUserName = "username"
-	StrUserId   = "user_id"
+	StrUserId   = "UserId"
 )

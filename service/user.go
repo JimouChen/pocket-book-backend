@@ -73,9 +73,10 @@ func Login(ctx *gin.Context) {
 		Username: userMsg.Username,
 		Password: userMsg.Password,
 	}
-	if err := mysql.CheckLogin(u); err != nil {
+	UserId, err := mysql.CheckLogin(u)
+	if err != nil {
 		ResponseErr(ctx, CodeUserErrLogin)
 		return
 	}
-	ResponseSuccess(ctx, "登陆成功")
+	ResponseSuccess(ctx, UserId)
 }

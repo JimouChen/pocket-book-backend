@@ -71,10 +71,10 @@ func EditCategoryById(ctx *gin.Context) {
 	ResponseSuccess(ctx, "编辑分类成功!")
 }
 
-func SearchCategoryByUserId(ctx *gin.Context) {
-	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
-
-	err, res := mysql.SearchCategoryByUserId(userId)
+func SearchCategoryByUsername(ctx *gin.Context) {
+	username := ctx.Query("username")
+	//userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
+	err, res := mysql.SearchCategoryByUsername(username)
 	if err != nil {
 		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
 		return
