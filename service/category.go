@@ -27,7 +27,11 @@ func AddCategory(ctx *gin.Context) {
 		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
 		return
 	}
-	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
+	fmt.Println(ctx.Request.Header.Get(comm.StrUserId), "ddd")
+	//userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
+	userId, _ := strconv.Atoi(ReqData.UserId)
+	fmt.Println(ReqData.UserId, " ffkk")
+
 	// 写表
 	if err := mysql.AddCategory(cateName, userId); err != nil {
 		ResponseErrWithMsg(ctx, CodeServerBusy, fmt.Sprintf("添加分类失败：%s", err.Error()))
