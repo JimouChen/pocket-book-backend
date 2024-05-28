@@ -27,10 +27,7 @@ func AddCategory(ctx *gin.Context) {
 		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
 		return
 	}
-	fmt.Println(ctx.Request.Header.Get(comm.StrUserId), "ddd")
-	//userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
-	userId, _ := strconv.Atoi(ReqData.UserId)
-	fmt.Println(ReqData.UserId, " ffkk")
+	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
 
 	// 写表
 	if err := mysql.AddCategory(cateName, userId); err != nil {

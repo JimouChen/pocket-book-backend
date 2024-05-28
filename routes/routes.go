@@ -4,11 +4,22 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"pocket-book/service"
+	"time"
 )
 
 func Init() *gin.Engine {
 	r := gin.Default()
-	r.Use(cors.Default())
+
+	// 使用自定义的 CORS 配置
+	//r.Use(cors.Default())
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // 允许所有来源
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"UserId", "username", "Content-Type"}, // 添加需要允许的请求头
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	v1 := r.Group("/api/v1")
 

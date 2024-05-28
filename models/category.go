@@ -1,8 +1,8 @@
 package models
 
 type ParamCategories struct {
-	Name   string `json:"name" db:"name" binding:"required"`
-	UserId string `json:"UserId"  binding:"required"`
+	Name string `json:"name" db:"name" binding:"required"`
+	//UserId string `json:"UserId"  binding:"required"`
 }
 
 type ParamCategoryId struct {
