@@ -39,16 +39,12 @@ func AddCategory(ctx *gin.Context) {
 }
 
 func DeleteCategory(ctx *gin.Context) {
-	ReqData := new(models.ParamCategoryId)
-	if err := ctx.ShouldBindJSON(ReqData); err != nil {
-		comm.Logger.Error().Msgf("DeleteCategory api invalid param", err.Error())
-		ResponseErrWithMsg(ctx, CodeInvalidParams, err.Error())
-		return
-	}
+	categoryId := ctx.Query(comm.StrCategoryId)
 	username := ctx.Request.Header.Get(comm.StrUserName)
 	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
+	CategoryId, _ := strconv.Atoi(categoryId)
 
-	if err := mysql.DeleteCategoryById(ReqData.Id, userId); err != nil {
+	if err := mysql.DeleteCategoryById(CategoryId, userId); err != nil {
 		ResponseErrWithMsg(ctx, CodeServerBusy, fmt.Sprintf("删除分类失败：%s", err.Error()))
 		return
 	}
