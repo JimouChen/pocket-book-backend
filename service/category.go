@@ -1,7 +1,6 @@
 package service
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"pocket-book/comm"
@@ -18,15 +17,6 @@ func AddCategory(ctx *gin.Context) {
 		return
 	}
 	cateName := ReqData.Name
-	// 检查分类是否存在，存在则提示，不存在则写入
-	if err := mysql.CheckCategoryIsExist(cateName); err != nil {
-		if errors.Is(err, comm.ErrCategoryExist) {
-			ResponseErr(ctx, CodeCategoryExist)
-			return
-		}
-		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
-		return
-	}
 	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
 
 	// 写表
@@ -39,12 +29,18 @@ func AddCategory(ctx *gin.Context) {
 }
 
 func DeleteCategory(ctx *gin.Context) {
-	categoryId := ctx.Query(comm.StrCategoryId)
+	//categoryId := ctx.Query(comm.StrCategoryId)
+	var reqData models.ParamDeleteCategory
+	if err := ctx.ShouldBindJSON(&reqData); err != nil {
+		comm.Logger.Error().Msgf("DelCategory api invalid param", err.Error())
+		ResponseErrWithMsg(ctx, CodeInvalidParams, err.Error())
+		return
+	}
 	username := ctx.Request.Header.Get(comm.StrUserName)
 	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
-	CategoryId, _ := strconv.Atoi(categoryId)
+	//CategoryId, _ := strconv.Atoi(categoryId)
 
-	if err := mysql.DeleteCategoryById(CategoryId, userId); err != nil {
+	if err := mysql.DeleteCategoryByNames(reqData.CategoryNames, userId); err != nil {
 		ResponseErrWithMsg(ctx, CodeServerBusy, fmt.Sprintf("删除分类失败：%s", err.Error()))
 		return
 	}

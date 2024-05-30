@@ -13,3 +13,7 @@ type ParamEditCategory struct {
 	Id   int    `json:"id" db:"id" binding:"required"`
 	Name string `json:"name" db:"name" binding:"required"`
 }
+
+type ParamDeleteCategory struct {
+	CategoryNames []string `json:"categoryNames" binding:"required"`
+}

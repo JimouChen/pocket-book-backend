@@ -3,27 +3,56 @@ package mysql
 import (
 	sql2 "database/sql"
 	"errors"
+	"github.com/jmoiron/sqlx"
 	"pocket-book/comm"
 	"pocket-book/models"
 )
 
-func CheckCategoryIsExist(name string) (err error) {
+func CheckCategoryIsExist(name string, userId int) (error, int, int) {
 	sql := "select count(id) from t_categories where name = ?;"
-	var cnt int
+	subSql := `
+		select count(tc.id) as cnt
+		from t_categories tc
+				 join t_user2cate tu2c on tu2c.category_id = tc.id
+		where name = ? and tu2c.user_id = ?;
+		`
+	var cnt, subCnt int
 	if err := db.Get(&cnt, sql, name); err != nil {
-		return comm.ErrServerBusy
+		return comm.ErrServerBusy, 0, 0
 	}
-	if cnt > 0 {
-		return comm.ErrCategoryExist
+	if err := db.Get(&subCnt, subSql, name, userId); err != nil {
+		return comm.ErrServerBusy, 0, 0
 	}
-	return
+
+	return nil, cnt, subCnt
 }
 
 func AddCategory(name string, userId int) (err error) {
+	_, cnt, subCnt := CheckCategoryIsExist(name, userId)
+	if (cnt > 0) && (subCnt > 0) {
+		return comm.ErrCategoryExist
+	}
 	session := SqlUtil{}.NewSession()
 	if session == nil {
 		return comm.ErrCreateMysqlSession
 	}
+
+	if (cnt > 0) && (subCnt == 0) {
+		getCateIdSql := "select id from t_categories where name = ?;"
+		var CateId int
+		if err := db.Get(&CateId, getCateIdSql, name); err != nil {
+			return comm.ErrServerBusy
+		}
+		subSql := "insert into t_user2cate (user_id, category_id) VALUES (?, ?);"
+		_, err = session.Exec(subSql, userId, CateId)
+		if err != nil {
+			_ = session.Rollback()
+			return comm.ErrServerBusy
+		}
+		_ = session.Commit()
+		return
+	}
+	// 	cnt == 0 && subCnt == 0
 	sql := "insert into t_categories (name) values (?);"
 	subSql := "insert into t_user2cate (user_id, category_id) VALUES (?, ?);"
 	res, err := session.Exec(sql, name)
@@ -46,29 +75,37 @@ func AddCategory(name string, userId int) (err error) {
 	return
 }
 
-func DeleteCategoryById(cateId int, userId int) (err error) {
+func DeleteCategoryByNames(categoryNames []string, userId int) (err error) {
 	session := SqlUtil{}.NewSession()
-	if session == nil {
-		return comm.ErrCreateMysqlSession
+
+	queries := []string{
+		"DELETE FROM t_transactions WHERE category_id IN (SELECT id FROM t_categories tc WHERE tc.name IN (?)) AND user_id = ?",
+		"DELETE FROM t_user2cate WHERE category_id IN (SELECT id FROM t_categories tc WHERE tc.name IN (?)) AND user_id = ?",
 	}
-	subSql := "delete from t_transactions where category_id = ? and user_id = ?;"
-	sql := "delete from t_user2cate where category_id = ? and user_id = ?;"
-	_, err = session.Exec(subSql, cateId, userId)
-	if err != nil {
+
+	args := [][]interface{}{
+		{categoryNames, userId},
+		{categoryNames, userId},
+	}
+	for i, query := range queries {
+		queries[i], args[i], err = sqlx.In(query, args[i]...)
+		if err != nil {
+			_ = session.Rollback()
+			return err
+		}
+	}
+	sqlUtil := SqlUtil{}
+	if err := sqlUtil.ExecQueries(session, queries, args); err != nil {
 		_ = session.Rollback()
-		comm.MysqlLogger.Error().Msg(err.Error())
-		return comm.ErrServerBusy
+		return err
 	}
-	_, err = session.Exec(sql, cateId, userId)
-	if err != nil {
+
+	if err := session.Commit(); err != nil {
 		_ = session.Rollback()
-		comm.MysqlLogger.Error().Msg(err.Error())
-		return comm.ErrServerBusy
+		return err
 	}
-	if err = session.Commit(); err != nil {
-		return
-	}
-	return
+
+	return nil
 }
 
 func EditCategoryById(id int, name string) (err error) {

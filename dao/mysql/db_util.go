@@ -16,3 +16,13 @@ func (SqlUtil) NewSession() *sqlx.Tx {
 	}
 	return session
 }
+
+func (SqlUtil) ExecQueries(tx *sqlx.Tx, queries []string, args [][]interface{}) error {
+	for i, query := range queries {
+		reboundQuery := tx.Rebind(query)
+		if _, err := tx.Exec(reboundQuery, args[i]...); err != nil {
+			return err
+		}
+	}
+	return nil
+}
