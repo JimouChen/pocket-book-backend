@@ -6,4 +6,5 @@ type ParmaAddExpenses struct {
 	Description     string  `json:"description,omitempty"`
 	Amount          float64 `json:"amount" binging:"required"`
 	TransactionDate string  `json:"transaction_date" binding:"required"`
+	Type            int8    `json:"type" db:"type" binding:"required"`
 }
