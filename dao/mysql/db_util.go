@@ -26,3 +26,17 @@ func (SqlUtil) ExecQueries(tx *sqlx.Tx, queries []string, args [][]interface{}) 
 	}
 	return nil
 }
+
+func (SqlUtil) ExecOpt(err error, session *sqlx.Tx) error {
+	if err != nil {
+		_ = session.Rollback()
+		return comm.ErrServerBusy
+	}
+
+	if err = session.Commit(); err != nil {
+		_ = session.Rollback()
+		comm.MysqlLogger.Error().Msgf("rollback session:%s", err.Error())
+		return comm.ErrServerBusy
+	}
+	return nil
+}

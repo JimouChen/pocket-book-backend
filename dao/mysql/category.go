@@ -33,9 +33,6 @@ func AddCategory(name string, userId int) (err error) {
 		return comm.ErrCategoryExist
 	}
 	session := SqlUtil{}.NewSession()
-	if session == nil {
-		return comm.ErrCreateMysqlSession
-	}
 
 	if (cnt > 0) && (subCnt == 0) {
 		getCateIdSql := "select id from t_categories where name = ?;"
