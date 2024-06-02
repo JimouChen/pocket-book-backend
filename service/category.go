@@ -66,7 +66,6 @@ func EditCategoryById(ctx *gin.Context) {
 
 func SearchCategoryByUsername(ctx *gin.Context) {
 	username := ctx.Query("username")
-	//userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
 	err, res := mysql.SearchCategoryByUsername(username)
 	if err != nil {
 		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())

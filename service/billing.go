@@ -22,5 +22,5 @@ func AddExpenses(ctx *gin.Context) {
 		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
 		return
 	}
-	ResponseSuccess(ctx, "新增记账支出记录成功！")
+	ResponseSuccess(ctx, "新增记账记录成功！")
 }
