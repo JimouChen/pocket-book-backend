@@ -40,3 +40,16 @@ func (SqlUtil) ExecOpt(err error, session *sqlx.Tx) error {
 	}
 	return nil
 }
+
+//func (SqlUtil) Query(sql string, args ...interface{}) (err error, results *[]interface{}) {
+//	if err = db.Select(&results, sql, args...); err != nil {
+//		if errors.Is(err, sql2.ErrNoRows) {
+//			comm.MysqlLogger.Info().Msg(sql2.ErrNoRows.Error())
+//			return
+//		}
+//		comm.MysqlLogger.Error().Msg(err.Error())
+//		err = comm.ErrServerBusy
+//		return
+//	}
+//	return
+//}

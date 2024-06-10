@@ -1,7 +1,11 @@
 package mysql
 
 import (
+	sql2 "database/sql"
+	"errors"
+	"pocket-book/comm"
 	"pocket-book/models"
+	"strings"
 )
 
 func AddExpenses(reqData *models.ParmaAddExpenses, userId int) (err error) {
@@ -12,4 +16,52 @@ func AddExpenses(reqData *models.ParmaAddExpenses, userId int) (err error) {
 	_, err = session.Exec(sql, userId, reqData.CategoryId, reqData.Title, reqData.Description, reqData.Amount, reqData.TransactionDate, reqData.Type)
 	err = SqlUtil{}.ExecOpt(err, session)
 	return err
+}
+
+func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err error, results []*models.ResponseSearchExpenses) {
+	results = []*models.ResponseSearchExpenses{} // 初始化结果切片
+	sql := `
+			SELECT DATE_FORMAT(tt.transaction_date, '%Y-%m-%d %H:%i:%s') as date,
+				   title,
+				   tt.description,
+				   amount,
+				   tc.name                                               as cate
+			FROM t_transactions tt
+					 JOIN t_categories tc ON tc.id = tt.category_id
+			WHERE tt.user_id = ?
+			  AND tt.type = ?
+			`
+	// 初始化参数切片
+	args := []interface{}{userId, reqData.Type}
+	// 构建额外的 WHERE 条件
+	var whereClauses []string
+	var values []interface{}
+
+	if reqData.Title != "" {
+		whereClauses = append(whereClauses, "tt.title LIKE concat('%', ?, '%')")
+		values = append(values, reqData.Title)
+	}
+	if reqData.TransactionBeginDate != "" && reqData.TransactionEndDate != "" {
+		whereClauses = append(whereClauses, "tt.transaction_date BETWEEN ? AND ?")
+		values = append(values, reqData.TransactionBeginDate, reqData.TransactionEndDate)
+	}
+
+	// 如果有额外的 WHERE 条件，添加到 SQL 语句中
+	if len(whereClauses) > 0 {
+		sql += " AND " + strings.Join(whereClauses, " AND ")
+		args = append(args, values...) // 合并参数
+	}
+
+	// 执行查询
+	err = db.Select(&results, sql, args...)
+	if err != nil {
+		if errors.Is(err, sql2.ErrNoRows) {
+			comm.MysqlLogger.Info().Msg("No rows found")
+			return
+		}
+		comm.MysqlLogger.Error().Msg(err.Error())
+		err = comm.ErrServerBusy
+		return
+	}
+	return
 }

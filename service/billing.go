@@ -24,3 +24,21 @@ func AddExpenses(ctx *gin.Context) {
 	}
 	ResponseSuccess(ctx, "新增记账记录成功！")
 }
+
+// SearchExpenses 支持查个人所有，和条件模糊查询
+func SearchExpenses(ctx *gin.Context) {
+	reqData := new(models.ParamSearchExpenses)
+	if err := ctx.ShouldBindJSON(reqData); err != nil {
+		comm.Logger.Error().Msgf("SearchExpenses api invalid param", err.Error())
+		ResponseErrWithMsg(ctx, CodeInvalidParams, err.Error())
+		return
+	}
+	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
+	// 查表
+	err, res := mysql.SearchCommExpenses(reqData, userId)
+	if err != nil {
+		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
+		return
+	}
+	ResponseSuccess(ctx, res)
+}
