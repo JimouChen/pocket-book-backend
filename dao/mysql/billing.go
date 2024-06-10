@@ -51,6 +51,7 @@ func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err er
 		sql += " AND " + strings.Join(whereClauses, " AND ")
 		args = append(args, values...) // 合并参数
 	}
+	sql += " order by tt.transaction_date desc ;"
 
 	// 执行查询
 	err = db.Select(&results, sql, args...)
