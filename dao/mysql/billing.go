@@ -3,6 +3,7 @@ package mysql
 import (
 	sql2 "database/sql"
 	"errors"
+	"fmt"
 	"pocket-book/comm"
 	"pocket-book/models"
 	"strings"
@@ -51,7 +52,8 @@ func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err er
 		sql += " AND " + strings.Join(whereClauses, " AND ")
 		args = append(args, values...) // 合并参数
 	}
-	sql += " order by tt.transaction_date desc ;"
+	pageSql := fmt.Sprintf("limit %d offset %d ;", reqData.Limit, reqData.Offset)
+	sql += " order by tt.transaction_date desc " + pageSql
 
 	// 执行查询
 	err = db.Select(&results, sql, args...)
