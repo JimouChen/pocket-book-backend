@@ -16,7 +16,7 @@ type ParamSearchExpenses struct {
 	TransactionBeginDate string `json:"transaction_begin_date,omitempty"`
 	TransactionEndDate   string `json:"transaction_end_date,omitempty"`
 	Limit                int    `json:"limit"  binding:"required"`
-	Offset               int8   `json:"offset"`
+	Offset               int    `json:"offset"`
 }
 
 type ResponseSearchExpenses struct {
