@@ -19,14 +19,22 @@ func AddExpenses(reqData *models.ParmaAddExpenses, userId int) (err error) {
 	return err
 }
 
-func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err error, results []*models.ResponseSearchExpenses) {
-	results = []*models.ResponseSearchExpenses{} // 初始化结果切片
+func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err error, results *models.ResponseSearchPay) {
+	//resultList := []*models.ResponseSearchExpenses{} // 初始化结果切片
+	results = new(models.ResponseSearchPay)
 	sql := `
 			SELECT DATE_FORMAT(tt.transaction_date, '%Y-%m-%d %H:%i:%s') as date,
 				   title,
 				   tt.description,
 				   amount,
 				   tc.name                                               as cate
+			FROM t_transactions tt
+					 JOIN t_categories tc ON tc.id = tt.category_id
+			WHERE tt.user_id = ?
+			  AND tt.type = ?
+			`
+	cntSql := `
+			SELECT count(tt.id) as total                                            
 			FROM t_transactions tt
 					 JOIN t_categories tc ON tc.id = tt.category_id
 			WHERE tt.user_id = ?
@@ -49,14 +57,16 @@ func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err er
 
 	// 如果有额外的 WHERE 条件，添加到 SQL 语句中
 	if len(whereClauses) > 0 {
-		sql += " AND " + strings.Join(whereClauses, " AND ")
+		filterSql := " AND " + strings.Join(whereClauses, " AND ")
+		sql += filterSql
+		cntSql += filterSql
 		args = append(args, values...) // 合并参数
 	}
 	pageSql := fmt.Sprintf("limit %d offset %d ;", reqData.Limit, reqData.Offset)
 	sql += " order by tt.transaction_date desc " + pageSql
 
 	// 执行查询
-	err = db.Select(&results, sql, args...)
+	err = db.Select(&results.ResList, sql, args...)
 	if err != nil {
 		if errors.Is(err, sql2.ErrNoRows) {
 			comm.MysqlLogger.Info().Msg("No rows found")
@@ -66,5 +76,7 @@ func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err er
 		err = comm.ErrServerBusy
 		return
 	}
+	_ = db.Get(&results.Total, cntSql, args...)
+
 	return
 }

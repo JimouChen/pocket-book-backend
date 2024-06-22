@@ -27,6 +27,11 @@ type ResponseSearchExpenses struct {
 	TransactionDate string  `json:"date" db:"date"`
 }
 
+type ResponseSearchPay struct {
+	ResList []*ResponseSearchExpenses `json:"resList"`
+	Total   int                       `json:"total" db:"total"`
+}
+
 type ResponseSearchList struct {
 	// 定义你的结构体字段
 }
