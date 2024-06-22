@@ -20,6 +20,7 @@ type ParamSearchExpenses struct {
 }
 
 type ResponseSearchExpenses struct {
+	BillId          int     `json:"bill_id" db:"bill_id"`
 	Cate            string  `json:"cate" db:"cate"`
 	Title           string  `json:"title" db:"title"`
 	Description     string  `json:"description" db:"description"`

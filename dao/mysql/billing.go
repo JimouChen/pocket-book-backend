@@ -23,7 +23,8 @@ func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err er
 	//resultList := []*models.ResponseSearchExpenses{} // 初始化结果切片
 	results = new(models.ResponseSearchPay)
 	sql := `
-			SELECT DATE_FORMAT(tt.transaction_date, '%Y-%m-%d %H:%i:%s') as date,
+			SELECT tt.id as bill_id,
+			       DATE_FORMAT(tt.transaction_date, '%Y-%m-%d %H:%i:%s') as date,
 				   title,
 				   tt.description,
 				   amount,
