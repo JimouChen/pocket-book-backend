@@ -38,6 +38,7 @@ func Init() *gin.Engine {
 	// 新增支出
 	v1.POST("/billing/expenses", service.AddExpenses)
 	v1.POST("/billing/search", service.SearchExpenses)
+	v1.PUT("/billing/expenses", service.EditExpenses)
 
 	return r
 }

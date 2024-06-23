@@ -19,8 +19,25 @@ func AddExpenses(reqData *models.ParmaAddExpenses, userId int) (err error) {
 	return err
 }
 
+func EditExpenses(reqData *models.ParmaEditExpenses, userId int) (err error) {
+	session := SqlUtil{}.NewSession()
+	sql := `
+		update t_transactions
+		set title            = ?,
+			description      = ?,
+			amount= ?,
+			category_id      = ?,
+			transaction_date = ?,
+			type             = ?
+		where id = ?;
+		`
+	_, err = session.Exec(sql, reqData.Title, reqData.Description, reqData.Amount, reqData.CategoryId, reqData.TransactionDate, reqData.Type, reqData.BillId)
+	err = SqlUtil{}.ExecOpt(err, session)
+	comm.MysqlLogger.Info().Msgf("%s 编辑了记账信息！", userId)
+	return err
+}
+
 func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err error, results *models.ResponseSearchPay) {
-	//resultList := []*models.ResponseSearchExpenses{} // 初始化结果切片
 	results = new(models.ResponseSearchPay)
 	sql := `
 			SELECT tt.id as bill_id,

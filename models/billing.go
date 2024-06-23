@@ -9,6 +9,16 @@ type ParmaAddExpenses struct {
 	Type            int8    `json:"type" db:"type" binding:"required"`
 }
 
+type ParmaEditExpenses struct {
+	BillId          int32   `json:"bill_id" binding:"required"`
+	CategoryId      int32   `json:"category_id" binding:"required"`
+	Title           string  `json:"title" binding:"required"`
+	Description     string  `json:"description,omitempty"`
+	Amount          float64 `json:"amount" binging:"required"`
+	TransactionDate string  `json:"transaction_date" binding:"required"`
+	Type            int8    `json:"type" db:"type" binding:"required"`
+}
+
 type ParamSearchExpenses struct {
 	// 可选参数来控制
 	Title                string `json:"title,omitempty" db:"title"`
