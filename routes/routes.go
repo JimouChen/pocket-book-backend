@@ -39,6 +39,7 @@ func Init() *gin.Engine {
 	v1.POST("/billing/expenses", service.AddExpenses)
 	v1.POST("/billing/search", service.SearchExpenses)
 	v1.PUT("/billing/expenses", service.EditExpenses)
+	v1.DELETE("/billing/expenses", service.DeleteExpenses)
 
 	return r
 }

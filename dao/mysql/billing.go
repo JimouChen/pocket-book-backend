@@ -37,6 +37,15 @@ func EditExpenses(reqData *models.ParmaEditExpenses, userId int) (err error) {
 	return err
 }
 
+func DeleteExpenses(billId, userId int) (err error) {
+	session := SqlUtil{}.NewSession()
+	sql := `delete from t_transactions where id = ?;`
+	_, err = session.Exec(sql, billId)
+	err = SqlUtil{}.ExecOpt(err, session)
+	comm.MysqlLogger.Info().Msgf("%s 删除了记账信息！", userId)
+	return err
+}
+
 func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err error, results *models.ResponseSearchPay) {
 	results = new(models.ResponseSearchPay)
 	sql := `

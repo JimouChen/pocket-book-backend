@@ -42,6 +42,22 @@ func EditExpenses(ctx *gin.Context) {
 	ResponseSuccess(ctx, "编辑记账记录成功！")
 }
 
+func DeleteExpenses(ctx *gin.Context) {
+	reqData := new(models.ParamDeleteExpenses)
+	if err := ctx.ShouldBindJSON(reqData); err != nil {
+		comm.Logger.Error().Msgf("DeleteExpenses api invalid param", err.Error())
+		ResponseErrWithMsg(ctx, CodeInvalidParams, err.Error())
+		return
+	}
+	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
+	err := mysql.DeleteExpenses(reqData.BillId, userId)
+	if err != nil {
+		ResponseErrWithMsg(ctx, CodeServerBusy, err.Error())
+		return
+	}
+	ResponseSuccess(ctx, "删除记账记录成功！")
+}
+
 // SearchExpenses 支持查个人所有，和条件模糊查询
 func SearchExpenses(ctx *gin.Context) {
 	reqData := new(models.ParamSearchExpenses)

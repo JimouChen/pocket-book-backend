@@ -19,6 +19,10 @@ type ParmaEditExpenses struct {
 	Type            int8    `json:"type" db:"type" binding:"required"`
 }
 
+type ParamDeleteExpenses struct {
+	BillId int `json:"billId" binding:"required"`
+}
+
 type ParamSearchExpenses struct {
 	// 可选参数来控制
 	Title                string `json:"title,omitempty" db:"title"`
