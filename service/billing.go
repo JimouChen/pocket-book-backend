@@ -75,3 +75,25 @@ func SearchExpenses(ctx *gin.Context) {
 	}
 	ResponseSuccess(ctx, res)
 }
+
+// SearchExpensesPreview 首页查看收支概览
+func SearchExpensesPreview(ctx *gin.Context) {
+	reqData := new(models.ParamSearchExpensesPreview)
+	if err := ctx.ShouldBindJSON(reqData); err != nil {
+		comm.Logger.Error().Msgf("SearchExpenses api invalid param", err.Error())
+		ResponseErrWithMsg(ctx, CodeInvalidParams, err.Error())
+		return
+	}
+	userId, _ := strconv.Atoi(ctx.Request.Header.Get(comm.StrUserId))
+
+	// 总支出, 总收入
+	res, err := mysql.SearchExpensesPreview(reqData, userId)
+	if err != nil {
+		return
+	}
+	retData := new(models.ResponseSearchExpensesPreview)
+	retData.TotalPay, retData.TotalIncome, retData.Overall = res.TotalPay, res.TotalIncome, res.Overall
+	// rate 之后可扩展
+
+	ResponseSuccess(ctx, retData)
+}

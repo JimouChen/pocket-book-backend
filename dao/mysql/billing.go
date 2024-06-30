@@ -107,3 +107,26 @@ func SearchCommExpenses(reqData *models.ParamSearchExpenses, userId int) (err er
 
 	return
 }
+
+func SearchExpensesPreview(reqData *models.ParamSearchExpensesPreview, userId int) (result *models.ResponseSearchTotalPayIncome, err error) {
+	result = new(models.ResponseSearchTotalPayIncome)
+	sql := `
+		select COALESCE(sum(if(tt.type = 1, tt.amount, 0)), 0)                                                   as total_pay,
+			   COALESCE(sum(if(tt.type = 2, tt.amount, 0)), 0)                                                   as total_income,
+			   COALESCE(sum(if(tt.type = 2, tt.amount, 0)), 0) - COALESCE(sum(if(tt.type = 1, tt.amount, 0)), 0) as overall
+		from t_transactions tt
+		where tt.user_id = ? 
+	`
+	args := []interface{}{userId}
+
+	if reqData.StartTime != "" {
+		sql += " and tt.transaction_date BETWEEN ? AND ? ;"
+		args = append(args, reqData.StartTime, reqData.EndTime)
+	}
+	err = db.Select(&result, sql, args...)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
