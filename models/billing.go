@@ -25,7 +25,7 @@ type ParamDeleteExpenses struct {
 
 type ParamSearchExpensesPreview struct {
 	StartTime string `json:"start_time,omitempty"`
-	EndTime   string `json:"end_time_time,omitempty"`
+	EndTime   string `json:"end_time,omitempty"`
 }
 
 type ParamSearchExpenses struct {

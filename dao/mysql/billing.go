@@ -123,7 +123,7 @@ func SearchExpensesPreview(reqData *models.ParamSearchExpensesPreview, userId in
 		sql += " and tt.transaction_date BETWEEN ? AND ? ;"
 		args = append(args, reqData.StartTime, reqData.EndTime)
 	}
-	err = db.Select(&result, sql, args...)
+	err = db.Get(result, sql, args...)
 	if err != nil {
 		return nil, err
 	}
